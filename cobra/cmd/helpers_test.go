@@ -29,8 +29,14 @@ func reset() {
 }
 
 func TestProjectPath(t *testing.T) {
-	checkGuess(t, "", filepath.Join("github.com", "spf13", "hugo"), filepath.Join(getSrcPath(), "github.com", "spf13", "hugo"))
-	checkGuess(t, "", filepath.Join("spf13", "hugo"), filepath.Join(getSrcPath(), "github.com", "spf13", "hugo"))
+	gopath := os.Getenv("GOPATH")
+	os.Setenv("GOPATH", "/foo/a:/bar/b")
+	defer func() {
+		os.Setenv("GOPATH", gopath)
+	}()
+
+	checkGuess(t, "", filepath.Join("github.com", "spf13", "hugo"), filepath.Join(getSrcPaths()[0], "github.com", "spf13", "hugo"))
+	checkGuess(t, "", filepath.Join("spf13", "hugo"), filepath.Join(getSrcPaths()[0], "github.com", "spf13", "hugo"))
 	checkGuess(t, "", filepath.Join("/", "bar", "foo"), filepath.Join("/", "bar", "foo"))
 	checkGuess(t, "/bar/foo", "baz", filepath.Join("/", "bar", "foo", "baz"))
 	checkGuess(t, "/bar/foo/cmd", "", filepath.Join("/", "bar", "foo"))
